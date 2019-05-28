@@ -5,7 +5,6 @@ import FitImage from "react-native-fit-image";
 import openUrl from "./util/openUrl";
 import hasParents from "./util/hasParents";
 import applyStyle from "./util/applyStyle";
-import PlatformEnum from "./enum/PlatformEnum";
 
 const renderRules = {
   // when unknown elements are introduced, so it wont break
@@ -168,8 +167,8 @@ const renderRules = {
             style={styles.listUnorderedItemIcon}
           >
             {Platform.select({
-                [PlatformEnum.ANDROID]: "\u2022",
-                [PlatformEnum.IOS]: "\u00B7"
+                android: "\u2022",
+                ios: "\u00B7"
             })}
           </Text>
           <View style={[styles.listItem]}>{children}</View>
