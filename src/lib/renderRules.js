@@ -1,10 +1,11 @@
-import React, { Component, PropTypes } from 'react';
-import { Text, TouchableWithoutFeedback, View } from 'react-native';
+import React, { Component, PropTypes } from "react";
+import { Platform, Text, View } from "react-native";
 
-import FitImage from 'react-native-fit-image';
-import openUrl from './util/openUrl';
-import hasParents from './util/hasParents';
-import applyStyle from './util/applyStyle';
+import FitImage from "react-native-fit-image";
+import openUrl from "./util/openUrl";
+import hasParents from "./util/hasParents";
+import applyStyle from "./util/applyStyle";
+import PlatformEnum from "./enum/PlatformEnum";
 
 const renderRules = {
   // when unknown elements are introduced, so it wont break
@@ -23,7 +24,6 @@ const renderRules = {
       </Text>
     );
   },
-
   inline: (node, children, parent, styles) => {
     return <Text key={node.key}>{children}</Text>;
   },
@@ -53,17 +53,13 @@ const renderRules = {
   // a
   link: (node, children, parent, styles) => {
     return (
-      <Text key={node.key} style={styles.link} onPress={() => openUrl(node.attributes.href)}>
+      <Text
+        key={node.key}
+        style={styles.link}
+        onPress={() => openUrl(node.attributes.href)}
+      >
         {children}
       </Text>
-    );
-  },
-  // a with a non text element nested inside
-  blocklink: (node, children, parent, styles) => {
-    return (
-      <TouchableWithoutFeedback key={node.key} onPress={() => openUrl(node.attributes.href)} style={styles.blocklink}>
-        <View style={styles.image}>{children}</View>
-      </TouchableWithoutFeedback>
     );
   },
   em: (node, children, parent, styles) => {
@@ -77,13 +73,13 @@ const renderRules = {
   heading1: (node, children, parent, styles) => {
     return (
       <View key={node.key} style={styles.headingContainer}>
-        {applyStyle(children, [styles.heading, styles.heading1], 'Text')}
+        {applyStyle(children, [styles.heading, styles.heading1], "Text")}
       </View>
     );
   },
 
   heading2: (node, children, parent, styles) => {
-    children = applyStyle(children, [styles.heading, styles.heading2], 'Text');
+    children = applyStyle(children, [styles.heading, styles.heading2], "Text");
     return (
       <View key={node.key} style={styles.headingContainer}>
         {children}
@@ -92,22 +88,22 @@ const renderRules = {
   },
   heading3: (node, children, parent, styles) => (
     <View key={node.key} style={styles.headingContainer}>
-      {applyStyle(children, [styles.heading, styles.heading3], 'Text')}
+      {applyStyle(children, [styles.heading, styles.heading3], "Text")}
     </View>
   ),
   heading4: (node, children, parent, styles) => (
     <View key={node.key} style={styles.headingContainer}>
-      {applyStyle(children, [styles.heading, styles.heading4], 'Text')}
+      {applyStyle(children, [styles.heading, styles.heading4], "Text")}
     </View>
   ),
   heading5: (node, children, parent, styles) => (
     <View key={node.key} style={styles.headingContainer}>
-      {applyStyle(children, [styles.heading, styles.heading5], 'Text')}
+      {applyStyle(children, [styles.heading, styles.heading5], "Text")}
     </View>
   ),
   heading6: (node, children, parent, styles) => (
     <View key={node.key} style={styles.headingContainer}>
-      {applyStyle(children, [styles.heading, styles.heading6], 'Text')}
+      {applyStyle(children, [styles.heading, styles.heading6], "Text")}
     </View>
   ),
 
@@ -116,8 +112,6 @@ const renderRules = {
       {children}
     </View>
   ),
-
-  hardbreak: (node, children, parent, styles) => <View key={node.key} style={styles.hardbreak} />,
 
   blockquote: (node, children, parent, styles) => (
     <View key={node.key} style={styles.blockquote}>
@@ -167,19 +161,26 @@ const renderRules = {
   },
   // li
   list_item: (node, children, parent, styles) => {
-    if (hasParents(parent, 'bullet_list')) {
+    if (hasParents(parent, "bullet_list")) {
       return (
         <View key={node.key} style={styles.listUnorderedItem}>
-          <Text style={styles.listUnorderedItemIcon}>{'\u00B7'}</Text>
+          <Text
+            style={styles.listUnorderedItemIcon}
+          >
+            {Platform.select({
+                [PlatformEnum.ANDROID]: "\u2022",
+                [PlatformEnum.IOS]: "\u00B7"
+            })}
+          </Text>
           <View style={[styles.listItem]}>{children}</View>
         </View>
       );
     }
 
-    if (hasParents(parent, 'ordered_list')) {
+    if (hasParents(parent, "ordered_list")) {
       return (
         <View key={node.key} style={styles.listOrderedItem}>
-          <Text style={styles.listOrderedItemIcon}>{node.index + 1}{node.markup}</Text>
+          <Text style={styles.listOrderedItemIcon}>{node.index + 1}</Text>
           <View style={[styles.listItem]}>{children}</View>
         </View>
       );
@@ -201,7 +202,9 @@ const renderRules = {
       {children}
     </View>
   ),
-  tbody: (node, children, parent, styles) => <View key={node.key}>{children}</View>,
+  tbody: (node, children, parent, styles) => (
+    <View key={node.key}>{children}</View>
+  ),
   th: (node, children, parent, styles) => {
     return (
       <View key={node.key} style={[styles.tableHeaderCell]}>
@@ -228,10 +231,19 @@ const renderRules = {
   },
 
   // br
-  softbreak: (node, children, parent, styles) => <Text key={node.key}>{'\n'}</Text>,
+  softbreak: (node, children, parent, styles) => (
+    <Text key={node.key}>{"\n"}</Text>
+  ),
   image: (node, children, parent, styles) => {
-    return <FitImage indicator={true} key={node.key} style={styles.image} source={{ uri: node.attributes.src }} />;
-  },
+    return (
+      <FitImage
+        indicator={true}
+        key={node.key}
+        style={styles.image}
+        source={{ uri: node.attributes.src }}
+      />
+    );
+  }
 };
 
 export default renderRules;
